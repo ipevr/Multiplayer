@@ -5,17 +5,22 @@ using Mirror;
 
 public class MyNetworkManager : NetworkManager
 {
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        base.OnClientConnect(conn);
-
-        Debug.Log("I connected to the server!");
-    }
-
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
         base.OnServerAddPlayer(conn);
 
-        Debug.Log($"A player was added to the server. There are {numPlayers} Players on the server now.");
+        MyNetworkPlayer player = conn.identity.GetComponent<MyNetworkPlayer>();
+        player.SetDisplayName($"Player {numPlayers}");
+
+        Color displayColor = GetRandomColor();
+        player.SetDisplayColor(displayColor);
+    }
+
+    private Color GetRandomColor()
+    {
+        float r = Random.Range(0f, 1f);
+        float g = Random.Range(0f, 1f);
+        float b = Random.Range(0f, 1f);
+        return new Color(r, g, b);
     }
 }
