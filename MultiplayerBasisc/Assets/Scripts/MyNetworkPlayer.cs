@@ -15,6 +15,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     [SyncVar(hook = nameof(HandleDisplayColorUpdated))]
     [SerializeField] Color displayColor = Color.white;
 
+    #region Server
     [Server]
     public void SetDisplayName(string newDisplayName)
     {
@@ -27,6 +28,21 @@ public class MyNetworkPlayer : NetworkBehaviour
         displayColor = newDisplayColor;
     }
 
+    [Command]
+    private void CmdSetDisplayName(string newDisplayName)
+    {
+        if (newDisplayName.Length < 4)
+        {
+            Debug.Log("Invalid Name");
+            return;
+        }
+
+        RpcLogNewName(newDisplayName);
+        SetDisplayName(newDisplayName);
+    }
+    #endregion
+
+    #region Client
     private void HandleDisplayColorUpdated(Color oldColor, Color newColor)
     {
         displayColorRenderer.material.SetColor("_BaseColor", newColor);
@@ -36,5 +52,19 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
         displayNameText.text = newName;
     }
+
+    [ContextMenu("Set My Name")]
+    public void SetMyName()
+    {
+        //CmdSetDisplayName("My new Name");
+        CmdSetDisplayName("My");
+    }
+
+    [ClientRpc]
+    private void RpcLogNewName(string newDisplayName)
+    {
+        Debug.Log(newDisplayName);
+    }
+    #endregion
 }
 
